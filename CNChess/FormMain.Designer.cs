@@ -1,6 +1,6 @@
 ﻿namespace CNChess
 {
-    partial class Form1
+    partial class FormMain
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,10 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            SuspendLayout();
+            // 
+            // FormMain
+            // 
+            AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Text = "Form1";
+            ClientSize = new Size(678, 344);
+            Name = "FormMain";
+            Text = "象棋";
+            WindowState = FormWindowState.Maximized;
+            Paint += this.FormMain_Paint;
+            ResumeLayout(false);
         }
 
         #endregion
