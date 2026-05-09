@@ -23,7 +23,7 @@ namespace CNChess
 
             //创建画笔
             Pen thickPen = new Pen(Color.Black, 6);
-            Pen thinPen = new Pen(Color.Black, 2);
+            Pen thinPen = new Pen(Color.Black, 3);
 
             //绘制棋盘边框
             int gap = (int)(_rowHeight * 0.15);
@@ -80,6 +80,67 @@ namespace CNChess
             //书写蓝方和红方
             g.DrawString("蓝方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 2.2)));
             g.DrawString("红方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 6.4)));
+
+            //绘制第3行炮营营地
+            DrawCamp(g, new Point(_leftTop.X + _colWidth, _leftTop.Y + _rowHeight * 2), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth*7, _leftTop.Y + _rowHeight * 2), true, true);
+            //绘制第4行兵营营地
+            DrawCamp(g, new Point(_leftTop.X + _colWidth*0, _leftTop.Y + _rowHeight * 3), false, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth*2, _leftTop.Y + _rowHeight * 3), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 4, _leftTop.Y + _rowHeight * 3), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 6, _leftTop.Y + _rowHeight * 3), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 8, _leftTop.Y + _rowHeight * 3), true, false);
+            //绘制第七行兵营
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 0, _leftTop.Y + _rowHeight * 6), false, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 2, _leftTop.Y + _rowHeight * 6), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 4, _leftTop.Y + _rowHeight * 6), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 6, _leftTop.Y + _rowHeight * 6), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 8, _leftTop.Y + _rowHeight * 6), true, false);
+            //绘制第八行炮营
+            DrawCamp(g, new Point(_leftTop.X + _colWidth, _leftTop.Y + _rowHeight * 7), true, true);
+            DrawCamp(g, new Point(_leftTop.X + _colWidth * 7, _leftTop.Y + _rowHeight * 7), true, true);
+        }
+
+
+        //绘制营地标志
+        public void DrawCamp(Graphics g, Point center, Boolean drawLeft, Boolean drawRight)
+        {
+            //偏移量和线段长度
+            int offset = (int)(_rowHeight * 0.08);
+            int length = (int)(_rowHeight * 0.16);
+            //直角点坐标
+            Point corner = new Point();
+            //画笔对象
+            Pen thinpen = new Pen(Color.Black, 2);
+
+            //是否需要绘制左标志
+            if (drawLeft)
+            {
+                //绘制左上角直角边
+                corner.X = center.X - offset;
+                corner.Y = center.Y - offset;
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X-length, corner.Y));
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X, corner.Y-length));
+                //绘制左下角直角边
+                corner.X = center.X - offset;
+                corner.Y = center.Y + offset;
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X-length, corner.Y));
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X, corner.Y+length));
+            }
+            //是否需要绘制右标志
+            if(drawRight)
+            {
+                //绘制右上角
+                corner.X = center.X + offset;
+                corner.Y = center.Y - offset;
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X+length, corner.Y));
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X, corner.Y-length));
+                //绘制右下角
+                corner.X = center.X + offset;
+                corner.Y = center.Y + offset;
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X+ length, corner.Y));
+                g.DrawLine(thinpen, new Point(corner.X, corner.Y), new Point(corner.X, corner.Y + length));
+            }
         }
 
         public void FormMain_Paint(object sender, PaintEventArgs e)
