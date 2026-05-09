@@ -28,20 +28,59 @@
         /// </summary>
         private void InitializeComponent()
         {
+            menuStrip1 = new MenuStrip();
+            MenuItemGame = new ToolStripMenuItem();
+            MenuItemBegin = new ToolStripMenuItem();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
+            // 
+            // menuStrip1
+            // 
+            menuStrip1.ImageScalingSize = new Size(24, 24);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { MenuItemGame });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(1011, 32);
+            menuStrip1.TabIndex = 0;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // MenuItemGame
+            // 
+            MenuItemGame.DropDownItems.AddRange(new ToolStripItem[] { MenuItemBegin });
+            MenuItemGame.Name = "MenuItemGame";
+            MenuItemGame.Size = new Size(62, 28);
+            MenuItemGame.Text = "游戏";
+            // 
+            // MenuItemBegin
+            // 
+            MenuItemBegin.Name = "MenuItemBegin";
+            MenuItemBegin.ShortcutKeys = Keys.Control | Keys.B;
+            MenuItemBegin.Size = new Size(270, 34);
+            MenuItemBegin.Text = "开局";
+            MenuItemBegin.Click += MenuItemBegin_Click;
             // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(678, 344);
+            ClientSize = new Size(1011, 643);
+            Controls.Add(menuStrip1);
+            DoubleBuffered = true;
+            MainMenuStrip = menuStrip1;
             Name = "FormMain";
             Text = "象棋";
             WindowState = FormWindowState.Maximized;
-            Paint += this.FormMain_Paint;
+            Paint += FormMain_Paint;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem MenuItemGame;
+        private ToolStripMenuItem MenuItemBegin;
     }
 }

@@ -9,13 +9,92 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\blue_advisor.bmp" />
+    <None Remove="assets\blue_avator.bmp" />
+    <None Remove="assets\blue_cannon.bmp" />
+    <None Remove="assets\blue_chariot.bmp" />
+    <None Remove="assets\blue_elephant.bmp" />
+    <None Remove="assets\blue_king.bmp" />
+    <None Remove="assets\blue_knight.bmp" />
+    <None Remove="assets\blue_pawn.bmp" />
+    <None Remove="assets\red_advisor.bmp" />
+    <None Remove="assets\red_avator.bmp" />
+    <None Remove="assets\red_cannon.bmp" />
+    <None Remove="assets\red_chariot.bmp" />
+    <None Remove="assets\red_elephant.bmp" />
+    <None Remove="assets\red_king.bmp" />
+    <None Remove="assets\red_knight.bmp" />
+    <None Remove="assets\red_pawn.bmp" />
     <None Remove="desktop.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="desktop.jpg">
+    <Content Include="assets\blue_advisor.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\blue_avator.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_cannon.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_chariot.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_elephant.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_king.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_knight.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\blue_pawn.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\desktop.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_advisor.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_avator.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_cannon.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_chariot.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_elephant.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_king.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_knight.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\red_pawn.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
