@@ -1,6 +1,7 @@
 using System.Reflection.Metadata;
 using System.Collections.Generic;
 using System.Drawing;
+using System.DirectoryServices;
 namespace CNChess
 {
     //棋子的枚举类型
@@ -27,6 +28,12 @@ namespace CNChess
         //棋子的位图表
         private Dictionary<Piece, Bitmap> _pieceImages;
 
+        //保存拾起的棋子值
+        private Piece _pickChess = Piece.none;
+        //保存拾起的棋子原位置
+        private int _pickRow = 0, _pickCol = 0;
+        //保存落下的棋子位置
+        private int _dropRow = 0, _dropCol = 0;
         public FormMain()
         {
             InitializeComponent();
@@ -224,7 +231,7 @@ namespace CNChess
                         //设置透明色
                         piecebmp.MakeTransparent(Color.White);
                         //在棋盘交点绘制棋子
-                        g.DrawImage(piecebmp, _leftTop.X + (col-1) * _colWidth - _pieceR, _leftTop.Y + (row-1) * _rowHeight - _pieceR, _pieceR*2, _pieceR*2);
+                        g.DrawImage(piecebmp, _leftTop.X + (col - 1) * _colWidth - _pieceR, _leftTop.Y + (row - 1) * _rowHeight - _pieceR, _pieceR * 2, _pieceR * 2);
                     }
                 }
             }
@@ -240,8 +247,17 @@ namespace CNChess
                     _chess[row, col] = Piece.none;
                 }
             }
-            //初始化蓝方棋子
-            _chess[1, 1] = Piece.blue_chariot;
+            //保存拾起的棋子值
+            _pickChess = Piece.none;
+            //保存拾起的棋子原位置
+            _pickRow = 0;
+            _pickCol = 0;
+            //保存落下的棋子位置
+            _dropRow = 0;
+            _dropCol = 0;
+
+        //初始化蓝方棋子
+        _chess[1, 1] = Piece.blue_chariot;
             _chess[1, 2] = Piece.blue_knight;
             _chess[1, 3] = Piece.blue_elephant;
             _chess[1, 4] = Piece.blue_advisor;
@@ -252,16 +268,73 @@ namespace CNChess
             _chess[1, 9] = Piece.blue_chariot;
             _chess[3, 2] = Piece.blue_cannon;
             _chess[3, 8] = Piece.blue_cannon;
-            _chess[4, 1] = Piece.blue_pawn;_chess[4, 3] = Piece.blue_pawn;_chess[4, 5] = Piece.blue_pawn;_chess[4, 7] = Piece.blue_pawn;_chess[4, 9] = Piece.blue_pawn;
+            _chess[4, 1] = Piece.blue_pawn; _chess[4, 3] = Piece.blue_pawn; _chess[4, 5] = Piece.blue_pawn; _chess[4, 7] = Piece.blue_pawn; _chess[4, 9] = Piece.blue_pawn;
             //初始化红方棋子
             _chess[10, 1] = Piece.red_chariot;
-            _chess[10, 2] = Piece.red_knight; _chess[10, 3] = Piece.red_elephant; _chess[10, 4] = Piece.red_advisor; 
+            _chess[10, 2] = Piece.red_knight; _chess[10, 3] = Piece.red_elephant; _chess[10, 4] = Piece.red_advisor;
             _chess[10, 5] = Piece.red_king; _chess[10, 6] = Piece.red_advisor;
             _chess[10, 7] = Piece.red_elephant; _chess[10, 8] = Piece.red_knight; _chess[10, 9] = Piece.red_chariot;
-            _chess[8,2] = Piece.red_cannon; _chess[8, 8] = Piece.red_cannon;
-            _chess[7,1] = Piece.red_pawn; _chess[7, 3] = Piece.red_pawn; _chess[7, 5] = Piece.red_pawn; _chess[7, 7] = Piece.red_pawn; _chess[7, 9] = Piece.red_pawn;
+            _chess[8, 2] = Piece.red_cannon; _chess[8, 8] = Piece.red_cannon;
+            _chess[7, 1] = Piece.red_pawn; _chess[7, 3] = Piece.red_pawn; _chess[7, 5] = Piece.red_pawn; _chess[7, 7] = Piece.red_pawn; _chess[7, 9] = Piece.red_pawn;
             //使窗口失效并发送Paint信息，触发Paint事件重绘窗口
             Invalidate();
+        }
+
+        //将鼠标点击位置转换为棋盘行列号
+        public bool ConvertPointToRowCol(Point pt, out int row, out int col)
+        {
+            row = 0; col = 0;
+            //计算点击位置与棋盘左上角的相对坐标
+            int x = pt.X - _leftTop.X;
+            int y = pt.Y - _leftTop.Y;
+            //根据格子大小计算行列号
+            if (x >= -_colWidth / 2 && x <= 8 * _colWidth + _colWidth / 2 && y >= -_rowHeight / 2 && y <= 10 * _rowHeight + _rowHeight / 2)
+            {
+                col = (x + _colWidth / 2) / _colWidth + 1;
+                row = (y + _rowHeight / 2) / _rowHeight + 1;
+                return true;
+            }
+            return false;
+        }
+
+        private void FormMain_MouseDown(object sender, MouseEventArgs e)
+        {
+            //把鼠标点击位置转换为棋盘行列号
+            int row, col;
+            bool valid = ConvertPointToRowCol(e.Location, out row, out col);
+
+            //如果转换成功则显示信息
+            if (valid)
+            {
+                //MessageBox.Show("你点击了第" + row + "行，第" + col + "列", "提示");
+
+                //处理拾起动作
+                if (_pickChess == Piece.none)
+                {
+                    //如果该位置有棋子则拾起
+                    if (_chess[row, col] != Piece.none)
+                    {
+                        _pickChess = _chess[row, col];
+                        _pickRow = row;
+                        _pickCol = col;
+                        //MessageBox.Show("你拾起了第" + row + "行，第" + col + "列的棋子", "提示");
+                        Invalidate(); //重绘窗口显示拾起效果
+                    }
+
+                }
+                //处理落下
+                else
+                {
+                    _chess[_pickRow, _pickCol] = Piece.none;
+                    _chess[row, col] = _pickChess;
+                    _pickChess = Piece.none;
+                    _dropRow = row;
+                    _dropCol = col;
+                    //MessageBox.Show("你落下了第" + row + "行，第" + col + "列的棋子", "提示");
+                    Invalidate();
+                }
+            }
+            
         }
     }
 }

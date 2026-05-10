@@ -55,7 +55,7 @@
             // 
             MenuItemBegin.Name = "MenuItemBegin";
             MenuItemBegin.ShortcutKeys = Keys.Control | Keys.B;
-            MenuItemBegin.Size = new Size(270, 34);
+            MenuItemBegin.Size = new Size(211, 34);
             MenuItemBegin.Text = "开局";
             MenuItemBegin.Click += MenuItemBegin_Click;
             // 
@@ -71,6 +71,7 @@
             Text = "象棋";
             WindowState = FormWindowState.Maximized;
             Paint += FormMain_Paint;
+            MouseDown += FormMain_MouseDown;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
