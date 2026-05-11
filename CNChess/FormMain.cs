@@ -2,6 +2,7 @@ using System.Reflection.Metadata;
 using System.Collections.Generic;
 using System.Drawing;
 using System.DirectoryServices;
+using System.Diagnostics.Eventing.Reader;
 namespace CNChess
 {
     //棋子的枚举类型
@@ -336,6 +337,125 @@ namespace CNChess
             return false;
         }
 
+        //判定能否落子
+        private bool IsDrop(Piece curChess, int pickrow, int pickcal, int row, int cal)
+        {
+            //---根据当前棋子类型和玩家身份判断能否落子---//
+            //象
+            if(curChess == Piece.blue_elephant)
+            {
+                if(Math.Abs(pickrow-row)==2 && Math.Abs(pickcal-cal)==2 && _chess[(pickrow+row)/2,(pickcal+cal)/2] == Piece.none && row<=5)
+                {
+                    return true;
+                }
+            }
+            if (curChess == Piece.red_elephant)
+            {
+                if (Math.Abs(pickrow - row) == 2 && Math.Abs(pickcal - cal) == 2 && _chess[(pickrow + row) / 2, (pickcal + cal) / 2] == Piece.none && row >= 6)
+                {
+                    return true;
+                }
+            }
+            //马
+            if(curChess==Piece.blue_knight || curChess == Piece.red_knight)
+            {
+                //横走日
+                if(Math.Abs(pickrow-row)==1 && Math.Abs(pickcal-cal)==2 && _chess[pickrow, (pickcal+cal)/2] == Piece.none)
+                {
+                    return true;
+                }
+                //竖走日
+                if (Math.Abs(pickrow - row) == 2 && Math.Abs(pickcal - cal) == 1 && _chess[(pickrow+row)/2, pickcal] == Piece.none)
+                {
+                    return true;
+                }
+            }
+            //车
+            if(curChess==Piece.blue_chariot || curChess == Piece.red_chariot)
+            {
+                //横向移动
+                if(pickrow==row)
+                {
+                    for(int c = Math.Min(pickcal, cal)+1; c < Math.Max(pickcal, cal); ++c)
+                    {
+                        if(_chess[row, c] != Piece.none)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                //竖向移动
+                if (pickcal == cal)
+                {
+                    for (int r = Math.Min(pickrow, row) + 1; r < Math.Max(pickrow, row); ++r)
+                    {
+                        if (_chess[r, cal] != Piece.none)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            //炮
+            if(curChess==Piece.blue_cannon || curChess == Piece.red_cannon)
+            {
+                //横向移动
+                int cnt = 0;
+                if (pickrow == row)
+                {
+                    for (int c = Math.Min(pickcal, cal) + 1; c < Math.Max(pickcal, cal); ++c)
+                    {
+                        if (_chess[row, c] != Piece.none)
+                        {
+                            cnt++;
+                        }
+                    }
+                    if(cnt==0 && _chess[row,cal]==Piece.none) return true;
+                    else if(cnt==1 && _chess[row, cal]!=Piece.none) return true;
+                }
+                //竖向移动
+                if (pickcal == cal)
+                {
+                    for (int r = Math.Min(pickrow, row) + 1; r < Math.Max(pickrow, row); ++r)
+                    {
+                        if (_chess[r, cal] != Piece.none)
+                        {
+                            cnt++;
+                        }
+                    }
+                    if (cnt == 0 && _chess[row, cal] == Piece.none) return true;
+                    else if (cnt == 1 && _chess[row, cal] != Piece.none) return true;
+                }
+            }
+            //兵
+            if (curChess == Piece.blue_pawn)
+            {
+                if (pickrow <= 5)
+                {
+                    if (pickcal == cal && pickrow == row - 1) return true;
+                }
+                else
+                {
+                    if (pickcal == cal && pickrow == row - 1) return true;
+                    if(Math.Abs(pickcal-cal)==1 && pickrow==row) return true;
+                }
+            }
+            if (curChess == Piece.red_pawn)
+            {
+                if (pickrow >= 6)
+                {
+                    if (pickcal == cal && pickrow == row + 1) return true;
+                }
+                else
+                {
+                    if (pickcal == cal && pickrow == row + 1) return true;
+                    if (Math.Abs(pickcal - cal) == 1 && pickrow == row) return true;
+                }
+            }
+            return false;
+        }
         private void FormMain_MouseDown(object sender, MouseEventArgs e)
         {
             //左键下压
@@ -369,9 +489,7 @@ namespace CNChess
                     else if (_chess[row, col] == Piece.none || _chess[row, col].ToString().IndexOf(_player.ToString()) == -1)
                     {
                         //定义落子标志
-                        bool canDrop = false;
-
-                        //---处理落子逻辑---//
+                        bool canDrop = IsDrop(_pickChess, _pickRow, _pickCol, row, col);
 
                         if (canDrop)
                         {
