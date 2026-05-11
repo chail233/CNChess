@@ -34,6 +34,9 @@ namespace CNChess
         private Dictionary<Piece, Bitmap> _pieceImages;
         //桌面位图
         Bitmap deskbmp;
+        //头像
+        Bitmap _redAvator;
+        Bitmap _blueAvator;
 
         //保存拾起的棋子值
         private Piece _pickChess = Piece.none;
@@ -62,6 +65,9 @@ namespace CNChess
             deskbmp = new Bitmap("assets/desktop.jpg");
             //加载棋子图
             LoadPieceImages();
+            //加载头像
+            _redAvator = new Bitmap("assets/red_avator.bmp");
+            _blueAvator = new Bitmap("assets/blue_avator.bmp");
             //初始化棋子数组为“无子”
             for (int row = 1; row <= 10; ++row)
             {
@@ -159,6 +165,9 @@ namespace CNChess
             //书写蓝方和红方
             g.DrawString("蓝方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 2.2)));
             g.DrawString("红方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 6.4)));
+            //绘制头像
+            g.DrawImage(_blueAvator, _leftTop.X + _colWidth * 8 + 190, (int)(_leftTop.Y + _rowHeight * 2.8), _pieceR*2, _pieceR*2);
+            g.DrawImage(_redAvator, _leftTop.X + _colWidth * 8 + 190, (int)(_leftTop.Y + _rowHeight * 7), _pieceR * 2, _pieceR * 2);
 
             //绘制第3行炮营营地
             DrawCamp(g, new Point(_leftTop.X + _colWidth, _leftTop.Y + _rowHeight * 2), true, true);
@@ -329,44 +338,67 @@ namespace CNChess
 
         private void FormMain_MouseDown(object sender, MouseEventArgs e)
         {
-            //把鼠标点击位置转换为棋盘行列号
-            int row, col;
-            bool valid = ConvertPointToRowCol(e.Location, out row, out col);
-
-            //如果转换成功则显示信息
-            if (valid)
+            //左键下压
+            if(e.Button == MouseButtons.Left)
             {
-                //MessageBox.Show("你点击了第" + row + "行，第" + col + "列", "提示");
+                //把鼠标点击位置转换为棋盘行列号
+                int row, col;
+                bool valid = ConvertPointToRowCol(e.Location, out row, out col);
 
-                //处理拾起动作
-                if (_pickChess == Piece.none)
+                //如果转换成功则显示信息
+                if (valid)
                 {
-                    //如果该位置有棋子则拾起
-                    if (_chess[row, col] != Piece.none && _chess[row,col].ToString().IndexOf(_player.ToString())!=-1)
+                    //MessageBox.Show("你点击了第" + row + "行，第" + col + "列", "提示");
+
+                    //处理拾起动作
+                    if (_pickChess == Piece.none)
                     {
-                        _pickChess = _chess[row, col];
-                        _pickRow = row;
-                        _pickCol = col;
-                        _chess[_pickRow, _pickCol] = Piece.none;
-                        //MessageBox.Show("你拾起了第" + row + "行，第" + col + "列的棋子", "提示");
-                        Invalidate(); //重绘窗口显示拾起效果
-                    }
+                        //如果该位置有棋子则拾起
+                        if (_chess[row, col] != Piece.none && _chess[row, col].ToString().IndexOf(_player.ToString()) != -1)
+                        {
+                            _pickChess = _chess[row, col];
+                            _pickRow = row;
+                            _pickCol = col;
+                            _chess[_pickRow, _pickCol] = Piece.none;
+                            //MessageBox.Show("你拾起了第" + row + "行，第" + col + "列的棋子", "提示");
+                            Invalidate(); //重绘窗口显示拾起效果
+                        }
 
+                    }
+                    //处理落下
+                    else if (_chess[row, col] == Piece.none || _chess[row, col].ToString().IndexOf(_player.ToString()) == -1)
+                    {
+                        //定义落子标志
+                        bool canDrop = false;
+
+                        //---处理落子逻辑---//
+
+                        if (canDrop)
+                        {
+                            if (_player == Player.red) _player = Player.blue;
+                            else _player = Player.red;
+                            _chess[row, col] = _pickChess;
+                            _pickChess = Piece.none;
+                            _dropRow = row;
+                            _dropCol = col;
+                            //MessageBox.Show("你落下了第" + row + "行，第" + col + "列的棋子", "提示");
+                            Invalidate();
+                        }
+                    }
                 }
-                //处理落下
-                else if (_chess[row,col]==Piece.none || _chess[row,col].ToString().IndexOf(_player.ToString())==-1)
+            }
+            //右键下压,取消拾起的棋子
+            else if(e.Button == MouseButtons.Right)
+            {
+                if(_pickChess!= Piece.none)
                 {
-                    if (_player == Player.red) _player = Player.blue;
-                    else _player = Player.red;
-                    _chess[row, col] = _pickChess;
+                    _chess[_pickRow, _pickCol] = _pickChess;
                     _pickChess = Piece.none;
-                    _dropRow = row;
-                    _dropCol = col;
-                    //MessageBox.Show("你落下了第" + row + "行，第" + col + "列的棋子", "提示");
+                    _pickRow = 0;
+                    _pickCol = 0;
                     Invalidate();
                 }
             }
-
         }
         //绘制拾起棋子和落下棋子的标记
         public void DrawPickDropMark(Graphics g, int row, int col)
