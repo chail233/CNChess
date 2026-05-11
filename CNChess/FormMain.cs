@@ -11,6 +11,11 @@ namespace CNChess
         red_pawn = 1,red_cannon=2,red_chariot=3,red_elephant=4,red_knight=5,red_advisor=6,red_king=7,
         blue_pawn = 8, blue_cannon = 9, blue_chariot = 10, blue_elephant = 11, blue_knight = 12, blue_advisor = 13, blue_king = 14,
     }
+    //玩家的枚举类型
+    public enum Player
+    {
+        none=0,red=1,blue=2
+    }
 
     public partial class FormMain : Form
     {
@@ -39,6 +44,9 @@ namespace CNChess
 
         //鼠标当前位置
         private Point _curMousePoint = new Point(0, 0);
+
+        //当前行动的玩家
+        private Player _player = Player.none;
         public FormMain()
         {
             InitializeComponent();
@@ -259,6 +267,8 @@ namespace CNChess
 
         private void MenuItemBegin_Click(object sender, EventArgs e)
         {
+            //红方先走棋
+            _player = Player.red;
             //初始化棋子数组为“无子”
             for (int row = 1; row <= 10; ++row)
             {
@@ -332,7 +342,7 @@ namespace CNChess
                 if (_pickChess == Piece.none)
                 {
                     //如果该位置有棋子则拾起
-                    if (_chess[row, col] != Piece.none)
+                    if (_chess[row, col] != Piece.none && _chess[row,col].ToString().IndexOf(_player.ToString())!=-1)
                     {
                         _pickChess = _chess[row, col];
                         _pickRow = row;
@@ -344,9 +354,10 @@ namespace CNChess
 
                 }
                 //处理落下
-                else
+                else if (_chess[row,col]==Piece.none || _chess[row,col].ToString().IndexOf(_player.ToString())==-1)
                 {
-                    
+                    if (_player == Player.red) _player = Player.blue;
+                    else _player = Player.red;
                     _chess[row, col] = _pickChess;
                     _pickChess = Piece.none;
                     _dropRow = row;
