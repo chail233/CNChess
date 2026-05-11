@@ -27,6 +27,8 @@ namespace CNChess
 
         //棋子的位图表
         private Dictionary<Piece, Bitmap> _pieceImages;
+        //桌面位图
+        Bitmap deskbmp;
 
         //保存拾起的棋子值
         private Piece _pickChess = Piece.none;
@@ -34,6 +36,9 @@ namespace CNChess
         private int _pickRow = 0, _pickCol = 0;
         //保存落下的棋子位置
         private int _dropRow = 0, _dropCol = 0;
+
+        //鼠标当前位置
+        private Point _curMousePoint = new Point(0, 0);
         public FormMain()
         {
             InitializeComponent();
@@ -45,6 +50,8 @@ namespace CNChess
             //设置左上角坐标
             _leftTop.X = 2 * _rowHeight;
             _leftTop.Y = _leftTop.X;
+            //加载桌面图
+            deskbmp = new Bitmap("assets/desktop.jpg");
             //加载棋子图
             LoadPieceImages();
             //初始化棋子数组为“无子”
@@ -83,7 +90,6 @@ namespace CNChess
         public void DrawBoard(Graphics g)
         {
             //绘制桌面
-            Bitmap deskbmp = new Bitmap("assets/desktop.jpg");
             g.DrawImage(deskbmp, new Rectangle(0, 0, this.ClientSize.Width, this.ClientSize.Height));
 
             //创建画笔
@@ -164,6 +170,12 @@ namespace CNChess
             //绘制第八行炮营
             DrawCamp(g, new Point(_leftTop.X + _colWidth, _leftTop.Y + _rowHeight * 7), true, true);
             DrawCamp(g, new Point(_leftTop.X + _colWidth * 7, _leftTop.Y + _rowHeight * 7), true, true);
+
+            //绘制拾起棋子的位置标记
+            DrawPickDropMark(g, _pickRow, _pickCol);
+            //绘制落下棋子的位置标记
+            DrawPickDropMark(g, _dropRow, _dropCol);
+
         }
 
 
@@ -214,6 +226,7 @@ namespace CNChess
             DrawBoard(e.Graphics);
             //绘制棋子
             DrawPiece(e.Graphics);
+
         }
 
         public void DrawPiece(Graphics g)
@@ -234,6 +247,13 @@ namespace CNChess
                         g.DrawImage(piecebmp, _leftTop.X + (col - 1) * _colWidth - _pieceR, _leftTop.Y + (row - 1) * _rowHeight - _pieceR, _pieceR * 2, _pieceR * 2);
                     }
                 }
+            }
+            //在鼠标当前位置绘制拾起的棋子
+            if (_pickChess != Piece.none)
+            {
+                Bitmap pickChessBmp = _pieceImages[_pickChess];
+                pickChessBmp.MakeTransparent(Color.White);
+                g.DrawImage(pickChessBmp, _curMousePoint.X - _pieceR, _curMousePoint.Y - _pieceR, _pieceR * 2, _pieceR * 2);
             }
         }
 
@@ -256,8 +276,8 @@ namespace CNChess
             _dropRow = 0;
             _dropCol = 0;
 
-        //初始化蓝方棋子
-        _chess[1, 1] = Piece.blue_chariot;
+            //初始化蓝方棋子
+            _chess[1, 1] = Piece.blue_chariot;
             _chess[1, 2] = Piece.blue_knight;
             _chess[1, 3] = Piece.blue_elephant;
             _chess[1, 4] = Piece.blue_advisor;
@@ -317,6 +337,7 @@ namespace CNChess
                         _pickChess = _chess[row, col];
                         _pickRow = row;
                         _pickCol = col;
+                        _chess[_pickRow, _pickCol] = Piece.none;
                         //MessageBox.Show("你拾起了第" + row + "行，第" + col + "列的棋子", "提示");
                         Invalidate(); //重绘窗口显示拾起效果
                     }
@@ -325,7 +346,7 @@ namespace CNChess
                 //处理落下
                 else
                 {
-                    _chess[_pickRow, _pickCol] = Piece.none;
+                    
                     _chess[row, col] = _pickChess;
                     _pickChess = Piece.none;
                     _dropRow = row;
@@ -334,7 +355,39 @@ namespace CNChess
                     Invalidate();
                 }
             }
-            
+
+        }
+        //绘制拾起棋子和落下棋子的标记
+        public void DrawPickDropMark(Graphics g, int row, int col)
+        {
+            //如果位置存在
+            if (row != 0)
+            {
+                //画笔
+                Pen pen = new Pen(Color.Yellow, 4);
+                //位置点坐标
+                Point p = new Point(_leftTop.X + _colWidth * (col - 1), _leftTop.Y + _rowHeight * (row - 1));
+                //在位置四个角绘制标记
+                g.DrawLine(pen, p.X - _pieceR, p.Y - _pieceR, p.X - _pieceR / 2, p.Y - _pieceR);
+                g.DrawLine(pen, p.X - _pieceR, p.Y - _pieceR, p.X - _pieceR, p.Y - _pieceR / 2);
+                g.DrawLine(pen, p.X + _pieceR, p.Y - _pieceR, p.X + _pieceR / 2, p.Y - _pieceR);
+                g.DrawLine(pen, p.X + _pieceR, p.Y - _pieceR, p.X + _pieceR, p.Y - _pieceR / 2);
+                g.DrawLine(pen, p.X - _pieceR, p.Y + _pieceR, p.X - _pieceR / 2, p.Y + _pieceR);
+                g.DrawLine(pen, p.X - _pieceR, p.Y + _pieceR, p.X - _pieceR, p.Y + _pieceR / 2);
+                g.DrawLine(pen, p.X + _pieceR, p.Y + _pieceR, p.X + _pieceR / 2, p.Y + _pieceR);
+                g.DrawLine(pen, p.X + _pieceR, p.Y + _pieceR, p.X + _pieceR, p.Y + _pieceR / 2);
+            }
+        }
+
+        private void FormMain_MouseMove(object sender, MouseEventArgs e)
+        {
+            //保存鼠标位置
+            _curMousePoint = e.Location;
+            //判断是否拾起棋子
+            if (_pickChess != Piece.none)
+            {
+                Invalidate();
+            }
         }
     }
 }
