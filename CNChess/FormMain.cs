@@ -535,8 +535,23 @@ namespace CNChess
 
                         if (canDrop)
                         {
-                            if (_player == Player.red) _player = Player.blue;
-                            else _player = Player.red;
+                            if (_chess[row,col] == Piece.blue_king || _chess[row, col] == Piece.red_king)
+                            {
+                                if(_chess[row, col] == Piece.blue_king)
+                                {
+                                    MessageBox.Show("红方胜利！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                else
+                                {
+                                    MessageBox.Show("蓝方胜利！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                _player = Player.none;
+                            }
+                            else
+                            {
+                                if (_player == Player.red) _player = Player.blue;
+                                else _player = Player.red;
+                            }
                             _chess[row, col] = _pickChess;
                             _pickChess = Piece.none;
                             _dropRow = row;
