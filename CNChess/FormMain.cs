@@ -342,7 +342,7 @@ namespace CNChess
         {
             //---根据当前棋子类型和玩家身份判断能否落子---//
             //象
-            if(curChess == Piece.blue_elephant)
+            if (curChess == Piece.blue_elephant)
             {
                 if(Math.Abs(pickrow-row)==2 && Math.Abs(pickcal-cal)==2 && _chess[(pickrow+row)/2,(pickcal+cal)/2] == Piece.none && row<=5)
                 {
@@ -452,6 +452,48 @@ namespace CNChess
                 {
                     if (pickcal == cal && pickrow == row + 1) return true;
                     if (Math.Abs(pickcal - cal) == 1 && pickrow == row) return true;
+                }
+            }
+            //将（黑方：king / 红方：帅）规则：每次走一格，只能在九宫（3x3）内，不能出宫
+            if (curChess == Piece.blue_king || curChess == Piece.red_king)
+            {
+                //1. 每次只能移动 上下左右 一格
+                bool isOneStep = (Math.Abs(pickrow - row) == 1 && pickcal == cal) ||
+                                 (Math.Abs(pickcal - cal) == 1 && pickrow == row);
+
+                //2. 黑将 只能在 0~2行，3~5列（九宫）
+                if (curChess == Piece.blue_king)
+                {
+                    if (isOneStep && row >= 1 && row <= 3 && cal >= 4 && cal <= 6)
+                        return true;
+                }
+
+                //3. 红帅 只能在 7~9行，3~5列（九宫）
+                if (curChess == Piece.red_king)
+                {
+                    if (isOneStep && row >= 8 && row <= 10 && cal >= 4 && cal <= 6)
+                        return true;
+                }
+            }
+
+            //士（黑方：士 / 红方：仕）规则：斜走一格，不能出宫
+            if (curChess == Piece.blue_advisor || curChess == Piece.red_advisor)
+            {
+                //1. 必须斜着走一格
+                bool isDiagonalOneStep = Math.Abs(pickrow - row) == 1 && Math.Abs(pickcal - cal) == 1;
+
+                //2. 黑士 只能在 0~2行，3~5列
+                if (curChess == Piece.blue_advisor)
+                {
+                    if (isDiagonalOneStep && row >= 1 && row <= 3 && cal >= 4 && cal <= 6)
+                        return true;
+                }
+
+                //3. 红仕 只能在 7~9行，3~5列
+                if (curChess == Piece.red_advisor)
+                {
+                    if (isDiagonalOneStep && row >= 8 && row <= 10 && cal >= 4 && cal <= 6)
+                        return true;
                 }
             }
             return false;
