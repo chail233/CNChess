@@ -53,6 +53,9 @@ namespace CNChess
 
         //当前行动的玩家
         private Player _player = Player.none;
+
+        //保存路径
+        string savePath = Path.Combine(Application.StartupPath, "saves");
         public FormMain()
         {
             InitializeComponent();
@@ -79,7 +82,16 @@ namespace CNChess
                     _chess[row, col] = Piece.none;
                 }
             }
+            
+            // 创建保存目录
+            if (!Directory.Exists(savePath))
+            {
+                Directory.CreateDirectory(savePath);
+            }
 
+            //设置保存目录
+            saveFileDialog1.InitialDirectory = savePath;
+            openFileDialog1.InitialDirectory = savePath;
         }
         // 加载所有棋子图
         private void LoadPieceImages()
@@ -103,6 +115,22 @@ namespace CNChess
             _pieceImages.Add(Piece.blue_knight, new Bitmap("assets/blue_knight.bmp"));
             _pieceImages.Add(Piece.blue_advisor, new Bitmap("assets/blue_advisor.bmp"));
             _pieceImages.Add(Piece.blue_king, new Bitmap("assets/blue_king.bmp"));
+        }
+
+        //播放音效
+        public void PlaySound(string soundFile)
+        {
+            try
+            {
+                using (System.Media.SoundPlayer player = new System.Media.SoundPlayer(soundFile))
+                {
+                    player.Play();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("无法播放音效: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         //绘制棋盘
         public void DrawBoard(Graphics g)
@@ -323,6 +351,7 @@ namespace CNChess
             _chess[7, 1] = Piece.red_pawn; _chess[7, 3] = Piece.red_pawn; _chess[7, 5] = Piece.red_pawn; _chess[7, 7] = Piece.red_pawn; _chess[7, 9] = Piece.red_pawn;
             //使窗口失效并发送Paint信息，触发Paint事件重绘窗口
             Invalidate();
+            PlaySound("sounds/begin.wav");
         }
 
         //将鼠标点击位置转换为棋盘行列号
@@ -551,6 +580,7 @@ namespace CNChess
                                     MessageBox.Show("蓝方胜利！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
                                 _player = Player.none;
+                                PlaySound("sounds/over.wav");
                             }
                             else
                             {
@@ -567,6 +597,12 @@ namespace CNChess
 
                                 if (_player == Player.red) _player = Player.blue;
                                 else _player = Player.red;
+
+                                if (_chess[row, col] != Piece.none)
+                                {
+                                    PlaySound("sounds/eat.wav");
+                                }
+                                else PlaySound("sounds/drop.wav");
                             }
                             _chess[row, col] = _pickChess;
                             _pickChess = Piece.none;
@@ -626,9 +662,9 @@ namespace CNChess
 
         private void MenuItemUndo_Click(object sender, EventArgs e)
         {
-            if(_stepList.Count > 0)
+            if (_stepList.Count > 0)
             {
-                if(MessageBox.Show("悔棋？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("悔棋？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     //取出最后一步
                     Step lastStep = _stepList[_stepList.Count - 1];
@@ -647,7 +683,7 @@ namespace CNChess
                     _dropCol = 0;
 
                     //如果还有步骤，显示上一步的标记
-                    if(_stepList.Count > 0)
+                    if (_stepList.Count > 0)
                     {
                         Step prevStep = _stepList[_stepList.Count - 1];
                         _pickRow = prevStep.PickRow;
@@ -659,6 +695,99 @@ namespace CNChess
                     //重绘窗口
                     Invalidate();
                 }
+            }
+        }
+
+        private void MenuItemSave_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                //用于保存棋盘状态的文件流和二进制写入器
+                FileStream fs = new FileStream(saveFileDialog1.FileName, FileMode.Create);
+                BinaryWriter bw = new BinaryWriter(fs);
+
+                //写入当前玩家
+                bw.Write((int)_player);
+                //写入棋盘状态
+                for (int row = 1; row <= 10; ++row)
+                {
+                    for (int col = 1; col <= 9; ++col)
+                    {
+                        bw.Write((int)_chess[row, col]);
+                    }
+                }
+                //写入走棋步骤数
+                bw.Write(_stepList.Count);
+                //写入每一步的详细信息
+                foreach (Step step in _stepList)
+                {
+                    bw.Write((int)step.Player);
+                    bw.Write((int)step.PickChess);
+                    bw.Write(step.PickRow);
+                    bw.Write(step.PickCol);
+                    bw.Write((int)step.DropChess);
+                    bw.Write(step.DropRow);
+                    bw.Write(step.DropCol);
+                }
+                //关闭写入器和文件流
+                bw.Close();
+                fs.Close();
+            }
+        }
+
+        private void MenuItemOpen_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog()==DialogResult.OK)
+            {
+                //用于读取棋盘状态的文件流和二进制读取器
+                FileStream fs = new FileStream(openFileDialog1.FileName, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                //读取当前玩家
+                _player = (Player)br.ReadInt32();
+                //读取棋盘状态
+                for (int row = 1; row <= 10; ++row)
+                {
+                    for (int col = 1; col <= 9; ++col)
+                    {
+                        _chess[row, col] = (Piece)br.ReadInt32();
+                    }
+                }
+                //读取走棋步骤数
+                int stepCount = br.ReadInt32();
+                _stepList.Clear();
+                //读取每一步的详细信息
+                for (int i = 0; i < stepCount; ++i)
+                {
+                    Step step = new Step();
+                    step.Player = (Player)br.ReadInt32();
+                    step.PickChess = (Piece)br.ReadInt32();
+                    step.PickRow = br.ReadInt32();
+                    step.PickCol = br.ReadInt32();
+                    step.DropChess = (Piece)br.ReadInt32();
+                    step.DropRow = br.ReadInt32();
+                    step.DropCol = br.ReadInt32();
+                    _stepList.Add(step);
+                }
+                //关闭读取器和文件流
+                br.Close();
+                fs.Close();
+                //清除拾起和落下标记
+                _pickChess = Piece.none;
+                _pickRow = 0;
+                _pickCol = 0;
+                _dropRow = 0;
+                _dropCol = 0;
+                //如果还有步骤，显示上一步的标记
+                if (_stepList.Count > 0)
+                {
+                    Step prevStep = _stepList[_stepList.Count - 1];
+                    _pickRow = prevStep.PickRow;
+                    _pickCol = prevStep.PickCol;
+                    _dropRow = prevStep.DropRow;
+                    _dropCol = prevStep.DropCol;
+                }
+                //重绘窗口显示加载的棋盘状态
+                Invalidate();
             }
         }
     }

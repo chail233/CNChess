@@ -32,6 +32,11 @@
             MenuItemGame = new ToolStripMenuItem();
             MenuItemBegin = new ToolStripMenuItem();
             MenuItemUndo = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripSeparator();
+            MenuItemSave = new ToolStripMenuItem();
+            MenuItemOpen = new ToolStripMenuItem();
+            saveFileDialog1 = new SaveFileDialog();
+            openFileDialog1 = new OpenFileDialog();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -47,7 +52,7 @@
             // 
             // MenuItemGame
             // 
-            MenuItemGame.DropDownItems.AddRange(new ToolStripItem[] { MenuItemBegin, MenuItemUndo });
+            MenuItemGame.DropDownItems.AddRange(new ToolStripItem[] { MenuItemBegin, MenuItemUndo, toolStripMenuItem1, MenuItemSave, MenuItemOpen });
             MenuItemGame.Name = "MenuItemGame";
             MenuItemGame.Size = new Size(62, 28);
             MenuItemGame.Text = "游戏";
@@ -56,7 +61,7 @@
             // 
             MenuItemBegin.Name = "MenuItemBegin";
             MenuItemBegin.ShortcutKeys = Keys.Control | Keys.B;
-            MenuItemBegin.Size = new Size(270, 34);
+            MenuItemBegin.Size = new Size(251, 34);
             MenuItemBegin.Text = "开局";
             MenuItemBegin.Click += MenuItemBegin_Click;
             // 
@@ -64,9 +69,43 @@
             // 
             MenuItemUndo.Name = "MenuItemUndo";
             MenuItemUndo.ShortcutKeys = Keys.Control | Keys.Z;
-            MenuItemUndo.Size = new Size(270, 34);
+            MenuItemUndo.Size = new Size(251, 34);
             MenuItemUndo.Text = "悔棋";
             MenuItemUndo.Click += MenuItemUndo_Click;
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(248, 6);
+            // 
+            // MenuItemSave
+            // 
+            MenuItemSave.Name = "MenuItemSave";
+            MenuItemSave.ShortcutKeys = Keys.Control | Keys.S;
+            MenuItemSave.Size = new Size(251, 34);
+            MenuItemSave.Text = "保存残局";
+            MenuItemSave.Click += MenuItemSave_Click;
+            // 
+            // MenuItemOpen
+            // 
+            MenuItemOpen.Name = "MenuItemOpen";
+            MenuItemOpen.ShortcutKeys = Keys.Control | Keys.O;
+            MenuItemOpen.Size = new Size(251, 34);
+            MenuItemOpen.Text = "打开残局";
+            MenuItemOpen.Click += MenuItemOpen_Click;
+            // 
+            // saveFileDialog1
+            // 
+            saveFileDialog1.FileName = "*.chs";
+            saveFileDialog1.Filter = "所有文件|*.*|残局文件|*.chs";
+            saveFileDialog1.InitialDirectory = "saves";
+            saveFileDialog1.Title = "保存残局";
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "*.chs";
+            openFileDialog1.Filter = "所有文件|*.*|残局文件|*.chs";
+            openFileDialog1.Title = "打开残局";
             // 
             // FormMain
             // 
@@ -74,6 +113,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1011, 643);
             Controls.Add(menuStrip1);
+            Cursor = Cursors.Hand;
             DoubleBuffered = true;
             MainMenuStrip = menuStrip1;
             Name = "FormMain";
@@ -95,5 +135,10 @@
         private ToolStripMenuItem MenuItemGame;
         private ToolStripMenuItem MenuItemBegin;
         private ToolStripMenuItem MenuItemUndo;
+        private ToolStripSeparator toolStripMenuItem1;
+        private ToolStripMenuItem MenuItemSave;
+        private ToolStripMenuItem MenuItemOpen;
+        private SaveFileDialog saveFileDialog1;
+        private OpenFileDialog openFileDialog1;
     }
 }
