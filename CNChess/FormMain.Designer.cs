@@ -31,6 +31,7 @@
             menuStrip1 = new MenuStrip();
             MenuItemGame = new ToolStripMenuItem();
             MenuItemBegin = new ToolStripMenuItem();
+            MenuItemUndo = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -46,7 +47,7 @@
             // 
             // MenuItemGame
             // 
-            MenuItemGame.DropDownItems.AddRange(new ToolStripItem[] { MenuItemBegin });
+            MenuItemGame.DropDownItems.AddRange(new ToolStripItem[] { MenuItemBegin, MenuItemUndo });
             MenuItemGame.Name = "MenuItemGame";
             MenuItemGame.Size = new Size(62, 28);
             MenuItemGame.Text = "游戏";
@@ -58,6 +59,14 @@
             MenuItemBegin.Size = new Size(270, 34);
             MenuItemBegin.Text = "开局";
             MenuItemBegin.Click += MenuItemBegin_Click;
+            // 
+            // MenuItemUndo
+            // 
+            MenuItemUndo.Name = "MenuItemUndo";
+            MenuItemUndo.ShortcutKeys = Keys.Control | Keys.Z;
+            MenuItemUndo.Size = new Size(270, 34);
+            MenuItemUndo.Text = "悔棋";
+            MenuItemUndo.Click += MenuItemUndo_Click;
             // 
             // FormMain
             // 
@@ -85,5 +94,6 @@
         private MenuStrip menuStrip1;
         private ToolStripMenuItem MenuItemGame;
         private ToolStripMenuItem MenuItemBegin;
+        private ToolStripMenuItem MenuItemUndo;
     }
 }

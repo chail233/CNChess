@@ -28,6 +28,8 @@ namespace CNChess
 
         //保存棋盘的所有棋子值
         private Piece[,] _chess = new Piece[11, 10];
+        //走棋步骤
+        private List<Step> _stepList = new List<Step>();
         //棋子半径
         private int _pieceR = 59;
 
@@ -77,6 +79,7 @@ namespace CNChess
                     _chess[row, col] = Piece.none;
                 }
             }
+
         }
         // 加载所有棋子图
         private void LoadPieceImages()
@@ -167,7 +170,7 @@ namespace CNChess
             g.DrawString("蓝方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 2.2)));
             g.DrawString("红方", font3, brush, new Point((int)(_leftTop.X + _colWidth * 8 + 180), (int)(_leftTop.Y + _rowHeight * 6.4)));
             //绘制头像
-            g.DrawImage(_blueAvator, _leftTop.X + _colWidth * 8 + 190, (int)(_leftTop.Y + _rowHeight * 2.8), _pieceR*2, _pieceR*2);
+            g.DrawImage(_blueAvator, _leftTop.X + _colWidth * 8 + 190, (int)(_leftTop.Y + _rowHeight * 2.8), _pieceR * 2, _pieceR * 2);
             g.DrawImage(_redAvator, _leftTop.X + _colWidth * 8 + 190, (int)(_leftTop.Y + _rowHeight * 7), _pieceR * 2, _pieceR * 2);
 
             //绘制第3行炮营营地
@@ -277,6 +280,8 @@ namespace CNChess
 
         private void MenuItemBegin_Click(object sender, EventArgs e)
         {
+            //清空走棋步骤
+            _stepList.Clear();
             //红方先走棋
             _player = Player.red;
             //初始化棋子数组为“无子”
@@ -344,7 +349,7 @@ namespace CNChess
             //象
             if (curChess == Piece.blue_elephant)
             {
-                if(Math.Abs(pickrow-row)==2 && Math.Abs(pickcal-cal)==2 && _chess[(pickrow+row)/2,(pickcal+cal)/2] == Piece.none && row<=5)
+                if (Math.Abs(pickrow - row) == 2 && Math.Abs(pickcal - cal) == 2 && _chess[(pickrow + row) / 2, (pickcal + cal) / 2] == Piece.none && row <= 5)
                 {
                     return true;
                 }
@@ -357,28 +362,28 @@ namespace CNChess
                 }
             }
             //马
-            if(curChess==Piece.blue_knight || curChess == Piece.red_knight)
+            if (curChess == Piece.blue_knight || curChess == Piece.red_knight)
             {
                 //横走日
-                if(Math.Abs(pickrow-row)==1 && Math.Abs(pickcal-cal)==2 && _chess[pickrow, (pickcal+cal)/2] == Piece.none)
+                if (Math.Abs(pickrow - row) == 1 && Math.Abs(pickcal - cal) == 2 && _chess[pickrow, (pickcal + cal) / 2] == Piece.none)
                 {
                     return true;
                 }
                 //竖走日
-                if (Math.Abs(pickrow - row) == 2 && Math.Abs(pickcal - cal) == 1 && _chess[(pickrow+row)/2, pickcal] == Piece.none)
+                if (Math.Abs(pickrow - row) == 2 && Math.Abs(pickcal - cal) == 1 && _chess[(pickrow + row) / 2, pickcal] == Piece.none)
                 {
                     return true;
                 }
             }
             //车
-            if(curChess==Piece.blue_chariot || curChess == Piece.red_chariot)
+            if (curChess == Piece.blue_chariot || curChess == Piece.red_chariot)
             {
                 //横向移动
-                if(pickrow==row)
+                if (pickrow == row)
                 {
-                    for(int c = Math.Min(pickcal, cal)+1; c < Math.Max(pickcal, cal); ++c)
+                    for (int c = Math.Min(pickcal, cal) + 1; c < Math.Max(pickcal, cal); ++c)
                     {
-                        if(_chess[row, c] != Piece.none)
+                        if (_chess[row, c] != Piece.none)
                         {
                             return false;
                         }
@@ -399,7 +404,7 @@ namespace CNChess
                 }
             }
             //炮
-            if(curChess==Piece.blue_cannon || curChess == Piece.red_cannon)
+            if (curChess == Piece.blue_cannon || curChess == Piece.red_cannon)
             {
                 //横向移动
                 int cnt = 0;
@@ -412,8 +417,8 @@ namespace CNChess
                             cnt++;
                         }
                     }
-                    if(cnt==0 && _chess[row,cal]==Piece.none) return true;
-                    else if(cnt==1 && _chess[row, cal]!=Piece.none) return true;
+                    if (cnt == 0 && _chess[row, cal] == Piece.none) return true;
+                    else if (cnt == 1 && _chess[row, cal] != Piece.none) return true;
                 }
                 //竖向移动
                 if (pickcal == cal)
@@ -439,7 +444,7 @@ namespace CNChess
                 else
                 {
                     if (pickcal == cal && pickrow == row - 1) return true;
-                    if(Math.Abs(pickcal-cal)==1 && pickrow==row) return true;
+                    if (Math.Abs(pickcal - cal) == 1 && pickrow == row) return true;
                 }
             }
             if (curChess == Piece.red_pawn)
@@ -501,7 +506,7 @@ namespace CNChess
         private void FormMain_MouseDown(object sender, MouseEventArgs e)
         {
             //左键下压
-            if(e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 //把鼠标点击位置转换为棋盘行列号
                 int row, col;
@@ -535,9 +540,9 @@ namespace CNChess
 
                         if (canDrop)
                         {
-                            if (_chess[row,col] == Piece.blue_king || _chess[row, col] == Piece.red_king)
+                            if (_chess[row, col] == Piece.blue_king || _chess[row, col] == Piece.red_king)
                             {
-                                if(_chess[row, col] == Piece.blue_king)
+                                if (_chess[row, col] == Piece.blue_king)
                                 {
                                     MessageBox.Show("红方胜利！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
@@ -549,6 +554,17 @@ namespace CNChess
                             }
                             else
                             {
+                                //保存走棋步骤
+                                Step tempstep = new Step();
+                                tempstep.Player = _player;
+                                tempstep.PickChess = _pickChess;
+                                tempstep.PickRow = _pickRow;
+                                tempstep.PickCol = _pickCol;
+                                tempstep.DropChess = _chess[row, col];
+                                tempstep.DropRow = row;
+                                tempstep.DropCol = col;
+                                _stepList.Add(tempstep);
+
                                 if (_player == Player.red) _player = Player.blue;
                                 else _player = Player.red;
                             }
@@ -563,9 +579,9 @@ namespace CNChess
                 }
             }
             //右键下压,取消拾起的棋子
-            else if(e.Button == MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right)
             {
-                if(_pickChess!= Piece.none)
+                if (_pickChess != Piece.none)
                 {
                     _chess[_pickRow, _pickCol] = _pickChess;
                     _pickChess = Piece.none;
@@ -605,6 +621,44 @@ namespace CNChess
             if (_pickChess != Piece.none)
             {
                 Invalidate();
+            }
+        }
+
+        private void MenuItemUndo_Click(object sender, EventArgs e)
+        {
+            if(_stepList.Count > 0)
+            {
+                if(MessageBox.Show("悔棋？", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    //取出最后一步
+                    Step lastStep = _stepList[_stepList.Count - 1];
+                    _stepList.RemoveAt(_stepList.Count - 1);
+                    //恢复棋盘状态
+                    _chess[lastStep.PickRow, lastStep.PickCol] = lastStep.PickChess;
+                    _chess[lastStep.DropRow, lastStep.DropCol] = lastStep.DropChess;
+                    //恢复玩家
+                    _player = lastStep.Player;
+
+                    //清除拾起和落下标记
+                    _pickChess = Piece.none;
+                    _pickRow = 0;
+                    _pickCol = 0;
+                    _dropRow = 0;
+                    _dropCol = 0;
+
+                    //如果还有步骤，显示上一步的标记
+                    if(_stepList.Count > 0)
+                    {
+                        Step prevStep = _stepList[_stepList.Count - 1];
+                        _pickRow = prevStep.PickRow;
+                        _pickCol = prevStep.PickCol;
+                        _dropRow = prevStep.DropRow;
+                        _dropCol = prevStep.DropCol;
+                    }
+
+                    //重绘窗口
+                    Invalidate();
+                }
             }
         }
     }
